@@ -1,0 +1,1 @@
+"c:\Program Files\Oracle\VirtualBox\VBoxManage.exe" convertdd wow.bin elephant.vdi --format VDI
