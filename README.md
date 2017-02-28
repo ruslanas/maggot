@@ -1,6 +1,6 @@
 Build
 =====
-`fasm wow.bin`
+`fasm wow.asm`
 
 Test
 ====
