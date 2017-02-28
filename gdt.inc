@@ -20,8 +20,8 @@ gdt:
 	dw 0
 	db 0
 	db 10010010b
-	db 11001111b
-	db 0
+	db 11111111b	  ; xxxx - [xxxx
+	db 0		  ; x] - xxxxxxx
 
 	;;;;;;;;;;;;;;
 	; user space ;
@@ -37,7 +37,7 @@ gdt:
 	dw 0
 	db 0
 	db 10010010b
-	db 11001111b
+	db 11111111b
 	db 0
 
 gdt_end:

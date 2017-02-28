@@ -1,1 +1,1 @@
-"c:\Program Files\Oracle\VirtualBox\VBoxManage.exe" convertdd wow.bin elephant.vdi --format VDI
+"c:\Program Files\Oracle\VirtualBox\VBoxManage.exe" convertdd maggot.bin maggot.vdi --format VDI

@@ -7,12 +7,6 @@ macro display_char arg1 {
       int 0x10
 }
 
-macro vga_char arg1 {
-	mov edi, 0xb8000
-	mov byte [edi + 2], arg1
-	mov byte [edi + 3], 00001111b
-}
-
 macro gate_entry segment, offset {
 	dw offset; offset_bits 0..15
 	dw segment ; code segment selector in GDT

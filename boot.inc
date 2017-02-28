@@ -23,7 +23,7 @@ load_kernel:
 	mov cl, 2			      ; sector number (1-17)
 	mov ah, 0x2
 	int 0x13
-	jnc _kernel_base		      ; execute
+	jnc switch_mode 		     ; execute
 
 	pop cx
 	dec cx
@@ -31,6 +31,28 @@ load_kernel:
 
 	display_char 'F'		      ; Fail
 	jmp $
+
+switch_mode:
+
+	mov ax,1				  ; VGA text mode
+	int 0x10
+
+	; https://software.intel.com/en-us/articles/intel-sdm
+	; 9.8 software initialization for protected mode
+
+	cli
+	lgdt [gdtr + _kernel_base]		  ; load GDT register
+	lidt [idtr + _kernel_base]		  ; load IDT register
+
+	mov eax, cr0
+	or eax, 1
+	mov cr0, eax				  ; set CRO PE flag (bit 0)
+
+	;smsw ax
+	;or ax, 1
+	;lmsw ax
+
+	jmp 0x08:__flush + _kernel_base
 
 	db 446 - $ dup 0		      ; align
 

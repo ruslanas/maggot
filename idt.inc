@@ -40,7 +40,8 @@ breakpoint_irs:
 gp_fault_irs:
 	cli
 	mov edi, 0xb8000
-	mov dword[edi + 12], 0x0f500f47
+	mov byte[edi + 14], 0x47
+	mov byte[edi + 15], 0x0f
 	int 0x80
 	iret
 
@@ -75,7 +76,7 @@ system_interrupt:
 	je .posix_read
 
 	.posix_fork:					   ; stub
-		mov eax, 0x0f500f50
+		mov eax, 0x0f500f50			   ; PP
 		mov ebx, 0x0C
 		call print
 		jmp .break
