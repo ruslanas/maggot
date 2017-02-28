@@ -1,45 +1,95 @@
+; Interrupt Descriptor Table
+
+use32
+
 db '__START__IDT__'
-
-macro gate_entry {
-	dw 0x6000 - page1 + exception; offset_bits 0..15
-	dw 8 ; code segment selector in GDT
-	db 0 ; 0 - unused;
-	db 11100111b ; type and attributes of the descriptor
-	; 1110 0xe - 80386 32-bit interrupt gate
-	; 0
-	; 00 - call protection
-	; 1
-	dw 0 ; offset bits 16..31
-}
-
 idtr:
 	dw end_idt - idt
-	dd 0x6000 + idt - page1
+	dd _kernel_base + idt
+
 idt:
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry
-	gate_entry	      ; 0xD general protection fault #GP
+	gate_entry 0x08,  _kernel_base + div_by_zero_irs
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + breakpoint_irs
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + invalid_opcode_irs
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + invalid_tss_irs   ; 10 - invalid_tss_irs
+	gate_entry 0x08,  _kernel_base + exception	   ; 11 - segment not present
+	gate_entry 0x08,  _kernel_base + exception
+	gate_entry 0x08,  _kernel_base + gp_fault_irs	   ; 0xD general protection fault #GP
+	repeat 0x80 - 14
+	       gate_entry 0x08,  _kernel_base + exception
+	end repeat
+	gate_entry 0x08,  _kernel_base + system_interrupt  ; int 0x80
 end_idt:
 db '__END__IDT__'
-dw 0x6000 + exception - page1
-exception: ; ISR
-	mov eax, 0x777 ; ! i'm here
-	vga_char 'X'
-	;jmp $ + 0x6000 - page1
-	;;;;;;;;;;;;;;;;;;;;;;;;;
-	; Proper return
-	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Interrupt Service Routines
+
+breakpoint_irs:
+	cli
+	vga_char 'b'
+	jmp $
 	iret
 
-base_addr dw 0x6000
+gp_fault_irs:
+	cli
+	mov edi, 0xb8000
+	mov dword[edi + 12], 0x0f500f47
+	int 0x80
+	iret
+
+invalid_tss_irs:
+	cli
+	vga_char 'T'
+	int 0x80
+	iret
+
+invalid_opcode_irs:
+	cli
+	vga_char 'I'
+	int 0x80
+	iret
+
+div_by_zero_irs:
+	cli
+	vga_char 'Z'
+	int 0x80
+	iret
+
+system_interrupt:
+	cli
+
+	cmp al, 1
+	je .exit
+
+	cmp al, 2
+	je .posix_fork
+
+	cmp al, 3
+	je .posix_read
+
+	.posix_fork:					   ; stub
+		mov eax, 0x0f500f50
+		mov ebx, 0x0C
+		call print
+		jmp .break
+	.posix_read:					   ; stub
+		call read
+		jmp .break
+	.exit:
+	.default:
+	.break:
+		jmp 0x08:_kernel_base + __recover
+
+exception:
+	cli
+	vga_char 'X'
+	int 0x80
+	iret
+

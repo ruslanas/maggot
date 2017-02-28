@@ -1,0 +1,43 @@
+; Global descripor table
+gdtr:
+	dw gdt_end - gdt - 1
+	dd gdt + _kernel_base
+
+gdt:
+	db 0, 0, 0, 0, 0, 0, 0, 0
+
+	;;;;;;;;;;;;;;;;
+	; kernel space ;
+	;;;;;;;;;;;;;;;;
+	dw 0xffff
+	dw 0
+	db 0
+	db 10011010b
+	db 11001111b
+	db 0
+
+	dw 0xffff
+	dw 0
+	db 0
+	db 10010010b
+	db 11001111b
+	db 0
+
+	;;;;;;;;;;;;;;
+	; user space ;
+	;;;;;;;;;;;;;;
+	dw 0xffff
+	dw 0
+	db 0
+	db 10011010b
+	db 11001111b
+	db 0
+
+	dw 0xffff
+	dw 0
+	db 0
+	db 10010010b
+	db 11001111b
+	db 0
+
+gdt_end:
