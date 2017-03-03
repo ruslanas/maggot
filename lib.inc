@@ -7,10 +7,19 @@ fork:
 	mov al, 2
 	int 0x80
 	ret
+
 print:
-	push eax
-	mov [0xb8000 + ebx], eax
-	pop eax
+	mov edi, 0
+	.l:
+	mov ah, byte[esi]
+	cmp ah, 0
+	je .end
+	mov byte[0xb8000 + edi * 2], ah
+	mov byte[0xb8000 + edi * 2 + 1], 0x1F
+	inc esi
+	inc edi
+	jmp .l
+	.end:
 	ret
 
 read:

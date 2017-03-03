@@ -5,27 +5,27 @@ use32
 db '__START__IDT__'
 idtr:
 	dw end_idt - idt
-	dd _kernel_base + idt
+	dd idt
 
 idt:
-	gate_entry 0x08,  _kernel_base + div_by_zero_irs
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + breakpoint_irs
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + invalid_opcode_irs
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + invalid_tss_irs   ; 10 - invalid_tss_irs
-	gate_entry 0x08,  _kernel_base + exception	   ; 11 - segment not present
-	gate_entry 0x08,  _kernel_base + exception
-	gate_entry 0x08,  _kernel_base + gp_fault_irs	   ; 0xD general protection fault #GP
+	gate_entry 0x08,  div_by_zero_irs
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  breakpoint_irs
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  invalid_opcode_irs
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  invalid_tss_irs   ; 10 - invalid_tss_irs
+	gate_entry 0x08,  exception	    ; 11 - segment not present
+	gate_entry 0x08,  exception
+	gate_entry 0x08,  gp_fault_irs	    ; 0xD general protection fault #GP
 	repeat 0x80 - 14
-	       gate_entry 0x08,  _kernel_base + exception
+	       gate_entry 0x08, exception
 	end repeat
-	gate_entry 0x08,  _kernel_base + system_interrupt  ; int 0x80
+	gate_entry 0x08, system_interrupt  ; int 0x80
 end_idt:
 db '__END__IDT__'
 
@@ -53,14 +53,16 @@ invalid_tss_irs:
 
 invalid_opcode_irs:
 	cli
-	vga_char 'I'
-	int 0x80
+	lea esi, [invalid_op]
+	call print
+	call exit
 	iret
 
 div_by_zero_irs:
 	cli
-	vga_char 'Z'
-	int 0x80
+	lea esi, [div_error]
+	call print
+	call exit
 	iret
 
 system_interrupt:
@@ -76,17 +78,17 @@ system_interrupt:
 	je .posix_read
 
 	.posix_fork:					   ; stub
-		mov eax, 0x0f500f50			   ; PP
-		mov ebx, 0x0C
+		lea esi, [not_implemented]
 		call print
-		jmp .break
+		call exit
 	.posix_read:					   ; stub
 		call read
 		jmp .break
 	.exit:
+		jmp __success
 	.default:
 	.break:
-		jmp 0x08:_kernel_base + __recover
+		jmp 0x08:__recover
 
 exception:
 	cli
@@ -94,3 +96,6 @@ exception:
 	int 0x80
 	iret
 
+invalid_op	db 'Invalid operation',0
+div_error	db 'Division by zero',0
+not_implemented db 'Function call not implemented',0

@@ -1,7 +1,7 @@
 ; Global descripor table
 gdtr:
 	dw gdt_end - gdt - 1
-	dd gdt + _kernel_base
+	dd gdt
 
 gdt:
 	db 0, 0, 0, 0, 0, 0, 0, 0
