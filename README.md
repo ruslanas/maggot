@@ -1,7 +1,7 @@
 Build
 =====
-`fasm wow.asm`
+`fasm maggot.asm`
 
 Test
 ====
-`emu`
+`emu maggot.bin`
