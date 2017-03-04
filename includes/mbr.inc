@@ -1,10 +1,5 @@
 use16
-;;;;;;;;;;;;;;;;;
-; Load sector 2 ;
-;;;;;;;;;;;;;;;;;
-
 org 0x7c00
-start:
 
 mov cx, 3				      ; retry 3 times
 __load_kernel:
@@ -15,9 +10,9 @@ __load_kernel:
 	mov ax, ds
 	mov es, ax
 	mov bx, __kernel_base
-	mov dl, 0x80			      ; first drive
-	mov dh, 0			      ; head
-	mov al, 9			      ; number of sectors to read
+	mov dl, 0x80			   ; first drive
+	mov dh, 0			       ; head
+	mov al, 18			       ; number of sectors to read
 
 	push cx
 	mov ch, 0
@@ -53,9 +48,9 @@ __switch_mode:
 	;or ax, 1
 	;lmsw ax
 
-	jmp 0x08:__flush
+	jmp 0x08:__protected_mode
 
-	db start + 446 - $ dup 0		  ; align
+	db ($$ - $) + 446 dup 0		  ; align
 
 	db 0x80 				  ; Active (bootable)
 	db 0					  ; Head	 (H)

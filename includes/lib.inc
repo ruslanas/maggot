@@ -8,19 +8,21 @@ fork:
 	int 0x80
 	ret
 
+log_addr 'print: 0x'
 print:
 	mov edi, 0
-	.l:
+
+	.put_char:
 	mov ah, byte[esi]
 	cmp ah, 0
-	je .end
-	mov byte[0xb8000 + edi * 2], ah
-	mov byte[0xb8000 + edi * 2 + 1], 0x1F
+	je .exit
+	mov byte[0xb8000 + edi], ah
+	mov byte[0xb8000 + edi + 1], 0x1F
 	inc esi
-	inc edi
-	jmp .l
-	.end:
-	ret
+	add edi, 2
+	jmp .put_char
+
+	.exit: ret
 
 read:
 	push eax
