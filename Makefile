@@ -17,4 +17,5 @@ clean:
 hatch: larva.img
 	$(QEMU) -d guest_errors -drive format=raw,file=larva.img
 vdi: larva.img
+	rm --force larva.vdi
 	$(VBM) convertdd larva.img larva.vdi --format VDI

@@ -1,1 +1,0 @@
-"c:\Program Files\Oracle\VirtualBox\VBoxManage.exe" convertdd maggot.bin maggot.vdi --format VDI

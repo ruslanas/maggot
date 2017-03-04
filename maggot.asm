@@ -1,9 +1,9 @@
 
-include 'macros.inc'
+include 'includes/macros.inc'
 
 __kernel_base equ 0x500
 
-include "mbr.inc"				  ; 512 bytes MBR
+include "includes/mbr.inc"				   ; 512 bytes MBR
 
 use32
 org __kernel_base
@@ -24,10 +24,10 @@ __wait:
 
 error_message	db 'Some error occured!',0
 
-include "idt.inc"
-include "gdt.inc"
-include "isr.inc"
-include "lib.inc"
+include "includes/idt.inc"
+include "includes/gdt.inc"
+include "includes/isr.inc"
+include "includes/lib.inc"
 
 db 1024 * 4 - ($ - __kernel_base) - 0x200 dup 0   ; align 4KB
 
