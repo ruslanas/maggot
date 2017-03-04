@@ -18,9 +18,3 @@ macro gate_entry segment, offset {
 	; 1
 	dw 0 ; offset bits 16..31
 }
-
-macro vga_char arg1 {
-	mov edi, 0xb8000
-	mov byte [edi + 2], arg1
-	mov byte [edi + 3], 00001111b
-}

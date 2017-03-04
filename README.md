@@ -1,7 +1,7 @@
 Build
 =====
-`fasm maggot.asm`
+`make`
 
-Test
-====
-`emu maggot.bin`
+Run
+===
+`make hatch`

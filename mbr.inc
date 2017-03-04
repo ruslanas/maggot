@@ -7,14 +7,14 @@ org 0x7c00
 start:
 
 mov cx, 3				      ; retry 3 times
-load_kernel:
+__load_kernel:
 
 	xor ah, ah			      ; reset disk system
 	int 0x13
 
 	mov ax, ds
 	mov es, ax
-	mov bx, _kernel_base		      ;
+	mov bx, __kernel_base
 	mov dl, 0x80			      ; first drive
 	mov dh, 0			      ; head
 	mov al, 9			      ; number of sectors to read
@@ -24,16 +24,16 @@ load_kernel:
 	mov cl, 2			      ; sector number (1-17)
 	mov ah, 0x2
 	int 0x13
-	jnc switch_mode 		     ; execute
+	jnc __switch_mode			; execute
 
 	pop cx
 	dec cx
-	jne load_kernel 		      ; loop end
+	jne __load_kernel			; loop end
 
 	display_char 'F'		      ; Fail
 	jmp $
 
-switch_mode:
+__switch_mode:
 
 	mov ax,1				  ; VGA text mode
 	int 0x10
@@ -42,8 +42,8 @@ switch_mode:
 	; 9.8 software initialization for protected mode
 
 	cli
-	lgdt [gdtr]		   ; load GDT register
-	lidt [idtr]		   ; load IDT register
+	lgdt [gdtr]				  ; load GDT register
+	lidt [idtr]				  ; load IDT register
 
 	mov eax, cr0
 	or eax, 1
@@ -55,7 +55,7 @@ switch_mode:
 
 	jmp 0x08:__flush
 
-	db start + 446 - $ dup 0			  ; align
+	db start + 446 - $ dup 0		  ; align
 
 	db 0x80 				  ; Active (bootable)
 	db 0					  ; Head	 (H)
@@ -72,4 +72,4 @@ switch_mode:
 	db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 	db 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
-	db 0x55, 0xAA			      ; signature
+	db 0x55, 0xAA				  ; signature

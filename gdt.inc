@@ -26,9 +26,9 @@ gdt:
 	;;;;;;;;;;;;;;
 	; user space ;
 	;;;;;;;;;;;;;;
-	dw 0xffff
-	dw 0
-	db 0
+	dw 0xffff	      ; limit
+	dw 0		      ; base 0:15
+	db 00000000b	      ; base 16:23
 	db 10011010b
 	db 11001111b
 	db 0

@@ -1,16 +1,12 @@
 
 include 'macros.inc'
 
-;format ELF
-;section '.text' writable executable
+__kernel_base equ 0x500
 
-_kernel_base equ 0x5000
-
-include 'boot.inc'				  ; 512 bytes
+include "mbr.inc"				  ; 512 bytes MBR
 
 use32
-org _kernel_base
-kernel_start:
+org __kernel_base
 
 __flush:
 	mov ax, 0x10
@@ -19,33 +15,38 @@ __flush:
 	mov fs, ax
 	mov gs, ax
 	mov ss, ax
-	jmp 0x18:test_program	   ; jump to user space
+	jmp 0x18:test_program			  ; jump to user space
 __recover:
-	lea esi, byte[oops]
+	lea esi, byte[error_message]
 	call print
+__wait:
 	jmp $
-__success:
-	jmp $
+
+error_message	db 'Some error occured!',0
+
 include "idt.inc"
 include "gdt.inc"
+include "isr.inc"
+include "lib.inc"
+
+db 1024 * 4 - ($ - __kernel_base) - 0x200 dup 0   ; align 4KB
 
 test_program:
 	lea esi, byte[hello]
 	call print
 
+	; call c lib function
+	; expect to function at fixed location in memory
+
+	;int 3
 	;mov eax, 0				  ; test interrupt service routines
 	;div eax				  ; divide by zero
 	;dw 0xFFFF				  ; invalid op
-	;jmp 0x24:0xffff			   ; tts
+	;jmp 0x24:0xffff			  ; tss
 
 	;call fork
 	call exit
 
-hello	db 'Protected mode',0
-done	db 'Task completed!!!',0
-oops	db 'Some error occured!',0
+hello	db 'User space!',0
 
-include 'lib.inc'
-
-db kernel_start + 1024 * 4 - $ dup 0				 ; align
-db 1020 * 1024 + 512 dup 0				; vboxmanage wants bigger files
+db 1024 * 8 - ($ - __kernel_base) - 0x200 dup 0   ; align 8KB
