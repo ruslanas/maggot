@@ -1,7 +1,8 @@
+; (c) 2017 Ruslanas Balciunas
 
 include 'includes/macros.inc'
 
-__kernel_base equ 0x500
+__kernel_base equ 0x600
 
 include "includes/mbr.inc"				   ; 512 bytes MBR
 
@@ -31,11 +32,16 @@ include "includes/lib.inc"
 db 1024 * 4 - ($ - $$) - 0x200 dup 0   ; align 4KB
 
 __test_program:
-	call 0x1E00 + $$                   ; hatch()
-	cmp eax, 0
-	jne .end_program
 
-	message hello
+	; relocate 3 sectors and jump to entry
+
+	_relocate 0x600, 0x1E00 + $$, 0x10000
+
+	; readelf -h egg.img
+	; ...
+	; Entry point address:               0x27e
+	; ...
+	call 0x10000 + 0x027e                   ; hatch()
 
 	.end_program: call exit
 

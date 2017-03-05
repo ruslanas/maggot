@@ -1,4 +1,4 @@
-CCFLAGS=-nostdinc -m32
+CCFLAGS=-nostdinc -nostdlib -m32
 CC=gcc
 VBM=VBoxManage
 QEMU=qemu-system-i386

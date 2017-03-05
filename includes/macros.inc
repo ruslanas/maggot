@@ -31,7 +31,18 @@ macro log_addr msg {
     display 13,10
 }
 
+; some really useful macros begin here
+
 macro message msg {
     lea esi, [msg]
     call print
+}
+
+macro _relocate count, from, to {
+	mov esi, from
+	mov edi, to
+	mov ecx, count
+	.move_byte:
+	movsb
+	loop .move_byte
 }
