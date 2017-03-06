@@ -12,7 +12,7 @@ __load_kernel:
 	mov bx, __kernel_base
 	mov dl, 0x80			   ; first drive
 	mov dh, 0			       ; head
-	mov al, 18			       ; number of sectors to read
+	mov al, 32			       ; number of sectors to read
 
 	push cx
 	mov ch, 0
@@ -30,7 +30,7 @@ __load_kernel:
 
 __switch_mode:
 
-	mov ax,1				  ; VGA text mode
+	mov ax,3				  ; VGA text mode
 	int 0x10
 
 	; https://software.intel.com/en-us/articles/intel-sdm

@@ -42,7 +42,7 @@ macro _relocate count, from, to {
 	mov esi, from
 	mov edi, to
 	mov ecx, count
-	.move_byte:
+	@@:
 	movsb
-	loop .move_byte
+	loop @r
 }

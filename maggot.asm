@@ -35,13 +35,15 @@ __test_program:
 
 	; relocate 3 sectors and jump to entry
 
-	_relocate 0x600, 0x1E00 + $$, 0x10000
+	base = 0x8000
+
+	_relocate 0x800, 0x1E00 + $$, base             ; .text
 
 	; readelf -h egg.img
-	; ...
-	; Entry point address:               0x27e
-	; ...
-	call 0x10000 + 0x027e                   ; hatch()
+	; extract entry point from ELF header
+	mov eax, [0x1E00 + $$ + 0x18]
+	add eax, base
+	call eax                   ; hatch()
 
 	.end_program: call exit
 
