@@ -6,7 +6,7 @@ SECTIONS {
     .text ALIGN(0x200) : {
         *(.text);
     }
-    .data ALIGN(0x200): {
+    .data ALIGN(0x200) : AT(0x2400) {
         video = 0x2400;
         gX = 0x2404;
         *(.data);

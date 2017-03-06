@@ -21,24 +21,10 @@ void reverse(char * str) {
     int len = strlen(str);
     for(int i=0;i<len/2;i++) {
         char tmp = str[i];
-        str[i] = str[len-1];
-        str[len-1] = tmp;
+        str[i] = str[len-1-i];
+        str[len-1-i] = tmp;
     }
 }
-
-int read_port(int x) {
-    __asm__(
-        "mov 4(%esp), %edx\n\t"
-        "in %dx, %al\n\t"
-        "mov 10, %eax"
-    );
-}
-
-// int write_port(int port, int data) {
-//     __asm__(
-//         ""
-//     );
-// }
 
 char * itoa(int num, char * str, int base) {
     int i = 0;
