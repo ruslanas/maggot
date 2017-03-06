@@ -19,14 +19,37 @@ __load_kernel:
 	mov cl, 2			      ; sector number (1-17)
 	mov ah, 0x2
 	int 0x13
-	jnc __switch_mode			; execute
+	jnc __housekeeping			; execute
 
 	pop cx
 	dec cx
 	jne __load_kernel			; loop end
 
-	display_char 'F'		      ; Fail
-	jmp $
+__housekeeping:
+
+	; load memory map for later usage
+	; at 0x8000
+
+	mov ecx, 24
+	mov edx, dword[magic]
+	mov di, 0x8000
+	xor ebx, ebx
+
+	@@:
+	mov eax, 0x0000E820
+	int 0x15
+	add di, cx
+	mov ecx, 20
+
+	cmp ebx, 0
+	jne @r
+
+	bios_print success_msg
+
+	jmp __switch_mode
+
+magic dd 'PAMS' 			  ; system memory map
+success_msg db 'Egg!',0
 
 __switch_mode:
 
@@ -50,7 +73,7 @@ __switch_mode:
 
 	jmp 0x08:__protected_mode
 
-	db ($$ - $) + 446 dup 0		  ; align
+	db ($$ - $) + 446 dup 0	  ; align
 
 	db 0x80 				  ; Active (bootable)
 	db 0					  ; Head	 (H)
@@ -58,8 +81,8 @@ __switch_mode:
 	db 0					  ; Cylinder	 (C)
 	db 0x7f 				  ; System ID
 	db 1					  ; Last H
-	db 00011111b				  ; Last S  (31) C9C8  S5....S0
-	db 00011111b				  ; Last C  (31)     C7......C0
+	db 00011111b			  ; Last S  (31) C9C8  S5....S0
+	db 00011111b			  ; Last C  (31)     C7......C0
 	dd 0					  ; LBA
 	dd 0x800				  ; Number of sectors (1MB/512kb)
 

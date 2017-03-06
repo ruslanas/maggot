@@ -2,19 +2,25 @@ CCFLAGS=-nostdinc -nostdlib -fno-builtin -m32
 CC=gcc
 VBM=VBoxManage
 QEMU=qemu-system-i386
+FILES=gdt.inc idt.inc isr.inc lib.inc macros.inc mbr.inc
+INCLUDES=$(FILES:%=includes/%)
+
 all: clean larva.img
+
+maggot.bin: maggot.asm $(INCLUDES)
+	fasm maggot.asm
+egg.img: sys.o linker.ld
+	ld --script linker.ld sys.o functions.o --output egg.img
 larva.img: maggot.bin egg.img
 	cat maggot.bin egg.img > larva.img
 	truncate --size 1048576 larva.img
-egg.img: lib.o linker.ld
-	ld --script linker.ld lib.o functions.o --output egg.img
-lib.o: lib.c lib/functions.c
-	$(CC) $(CCFLAGS) -c lib.c -o lib.o
+sys.o: sys.c functions.o
+	$(CC) $(CCFLAGS) -c sys.c -o sys.o
+functions.o: lib/functions.c
 	$(CC) $(CCFLAGS) -c lib/functions.c -o functions.o
-maggot.bin: maggot.asm includes/mbr.inc includes/lib.inc includes/macros.inc
-	fasm maggot.asm
+	
 clean:
-	rm --force lib.o maggot.bin egg.img larva.img
+	rm --force *.o maggot.bin *.img
 hatch: larva.img
 	$(QEMU) -d guest_errors -drive format=raw,file=larva.img
 vdi: larva.img

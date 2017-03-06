@@ -10,9 +10,9 @@ breakpoint_irs:
 gp_fault_irs:
 	cli
 	mov edi, 0xb8000
-	mov byte[edi + 14], 0x47
-	mov byte[edi + 15], 0x0f
-	int 0x80
+	lea esi, [gp_fault]
+	call print
+	call exit
 	iret
 
 invalid_tss_irs:
@@ -66,12 +66,13 @@ exception:
 	cli
 	lea esi, [msg_exception]
 	call print
-	call exit
+	;call exit
 	iret
 
-invalid_op	db 'Invalid operation',0
-div_error	db 'Division by zero',0
+invalid_op      db 'Invalid operation',0
+div_error       db 'Division by zero',0
 not_implemented db 'Function call not implemented',0
-tss_error	db 'TSS fault',0
-msg_breakpoint	db 'Breakpoint',0
-msg_exception	db 'Unknown error',0
+tss_error       db 'TSS fault',0
+msg_breakpoint  db 'Breakpoint',0
+msg_exception   db 'Unknown error',0
+gp_fault        db 'General protection fault',0

@@ -55,53 +55,29 @@ void hatch() {
     char buffer[1024] = "Press ESC to continue...";
     printAt(0, 1, buffer);
 
-    while(1) {
-        int i = read_port(0x60);
-        i = i & 0x000000FF;
-        itoa(i, buffer, 10);
+    // __asm__("cli");
+    // __asm__("sti");
+    int code = 0;
+    while(code != 129) {
+        code = read_port(0x60); // poll
+        code = code & 0x000000FF;
+        itoa(code, buffer, 10);
         printAt(1,0, buffer);
-        if(i == 129) {
-            break;
-        }
+
+        // write_port(0x70, 0x80 & 0xA);    // select CMOS register
+        // write_port(0x71, 0x20); // write to CMOS/RTC RAM
+        // int t = read_port(0x71);
+        // itoa(t, buffer, 10);
+        // printAt(1, 4, buffer);
     }
 
     clear_screen();
 
-    // ICW1 (Initialization Command Word One)
-    write_port(0x20, 0x11);
-    write_port(0xA0, 0x11);
-
-    // remap
-    write_port(0x21, 0x20);
-    write_port(0xA1, 0x28);
-
-    // ICW3 - cascading
-    write_port(0x21, 0x00);
-    write_port(0xA1, 0x00);
-
-    // ICW4 - setup cascading
-    write_port(0x21, 0x01);
-    write_port(0xA1, 0x01);
-
-    // mask interrupt
-    write_port(0x21, 0xFF);
-    write_port(0xA1, 0xFF);
-
-    write_port(0x21, 0xFD);
-    write_port(0x20, 0x20);
-
-    int status = read_port(0x64);
-
-    char ss[32];
-    itoa(0xABCDEF, ss, 16);
-    printAt(2, 11, ss);
-
-    char addr[1024];
-    itoa((int)&gX, addr, 16);
-    printAt(2, 7, addr);
-    printAt(2, 8, gX); // + relocation offset
-    itoa((int)&hatch, addr, 16);
-    printAt(2, 9, addr);
+    itoa((int)&gX, buffer, 16);
+    printAt(2, 7, buffer);
+    printAt(2, 8, gX);
+    itoa((int)&hatch, buffer, 16);
+    printAt(2, 9, buffer);
 
     char str[] = "Maggot 0.0.1";
     printAt(2, 1, str);

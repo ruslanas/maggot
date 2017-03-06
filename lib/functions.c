@@ -4,7 +4,7 @@ void strcat(char * dest, char * src) {
     int len = strlen(dest);
     int i = 0;
     for(;src[i]!='\0';i++) {
-        dest[len+i-1] = src[i];
+        dest[i + len - 1] = src[i];
     }
     dest[i] = '\0';
 }
@@ -21,8 +21,8 @@ void reverse(char * str) {
     int len = strlen(str);
     for(int i=0;i<len/2;i++) {
         char tmp = str[i];
-        str[i] = str[len-1-i];
-        str[len-1-i] = tmp;
+        str[i] = str[len - 1 - i];
+        str[len - 1 - i] = tmp;
     }
 }
 

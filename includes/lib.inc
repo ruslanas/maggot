@@ -3,6 +3,7 @@ exit:
 	mov ebx, 0
 	int 0x80		  ; system interrupt
 	ret
+
 fork:
 	mov al, 2
 	int 0x80
@@ -16,8 +17,8 @@ print:
 	mov ah, byte[esi]
 	cmp ah, 0
 	je .exit
-	mov byte[0xb8000 + edi], ah
-	mov byte[0xb8000 + edi + 1], 0x1F
+	mov byte[0xb8000 + 80 * 20 + edi], ah
+	mov byte[0xb8000 + 80 * 20 + edi + 1], 0x1F
 	inc esi
 	add edi, 2
 	jmp .put_char
