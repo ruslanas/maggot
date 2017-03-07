@@ -9,28 +9,44 @@ fork:
 	int 0x80
 	ret
 
-log_addr 'print: 0x'
+log_addr 'print(): 0x'
 print:
-	mov edi, 0
+	push ebp
+	mov ebp, esp
+	sub esp, 12
+	push esi
+	push edi
+	push edx
 
+	mov esi, [ebp + 4 + 4]
+	mov edi, 0
 	.put_char:
-	mov ah, byte[esi]
-	cmp ah, 0
+	mov dh, byte[esi]
+	cmp dh, 0
 	je .exit
-	mov byte[0xb8000 + 80 * 20 + edi], ah
-	mov byte[0xb8000 + 80 * 20 + edi + 1], 0x1F
-	inc esi
+
+	mov byte[0xb8000 + 24 * 80 * 2 + edi], dh
+	mov byte[0xb8001 + 24 * 80 * 2 + edi], 0x1F
+
 	add edi, 2
+	inc esi
 	jmp .put_char
 
-	.exit: ret
+	.exit:
+	pop edx
+	pop edi
+	pop esi
+	mov esp, ebp
+	pop ebp
+	ret
 
+line dd 11
+msg_not_implemented db 'Not implemented',0
 read:
+	mov ebp, esp
+	lea eax, [msg_not_implemented]
 	push eax
-	push ebx
-	mov eax, 0x0f250f25
-	mov ebx, 0x10
 	call print
-	pop ebx
 	pop eax
+	mov esp, ebp
 	ret

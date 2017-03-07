@@ -36,16 +36,20 @@ macro log_addr msg {
     display 13,10
 }
 
-macro message msg {
-    lea esi, [msg]
+macro _macro_message msg {
+    lea eax, [msg]
+    push eax
     call print
+    pop eax
 }
 
 macro _relocate count, from, to {
+    push esi
     mov esi, from
     mov edi, to
     mov ecx, count
     @@:
     movsb
     loop @r
+    pop esi
 }

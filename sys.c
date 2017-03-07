@@ -5,7 +5,7 @@ We are hacking here, you know. Expect a lot of crap.
 #include "lib/functions.h"
 
 unsigned volatile short * video = (unsigned volatile short *) 0xb8000;
-char gX[20] = "___data___";
+char gX[22] = "___Great_day_today___";
 
 int printAt(int x, int y, const char str[]) {
 
@@ -46,39 +46,38 @@ void clear_screen() {
     }
 }
 
-/*
-Entry point
-*/
-
-void hatch() {
-
-    char buffer[1024] = "Press ESC to continue...";
-    printAt(0, 1, buffer);
-
-    // __asm__("cli");
-    // __asm__("sti");
+void sleep() {
+    char buffer[16];
     int code = 0;
     while(code != 129) {
         code = read_port(0x60); // poll
         code = code & 0x000000FF;
         itoa(code, buffer, 10);
-        printAt(1,0, buffer);
-
-        // write_port(0x70, 0x80 & 0xA);    // select CMOS register
-        // write_port(0x71, 0x20); // write to CMOS/RTC RAM
-        // int t = read_port(0x71);
-        // itoa(t, buffer, 10);
-        // printAt(1, 4, buffer);
+        printAt(39, 12, buffer);
     }
+
+}
+
+/*
+Entry point
+*/
+
+int hatch() {
+
+    char buffer[64] = "Press ESC to continue...";
+    printAt(0, 1, buffer);
+
+    int (*stderr)(const char *);
+    stderr = (int (*)(const char *))(0xB9D); // address found in make output
+
+    sleep();
 
     clear_screen();
 
-    itoa((int)&gX, buffer, 16);
-    printAt(2, 7, buffer);
-    printAt(2, 8, gX);
-    itoa((int)&hatch, buffer, 16);
-    printAt(2, 9, buffer);
+    stderr(gX);
 
     char str[] = "Maggot 0.0.1";
     printAt(2, 1, str);
+
+    return 0;
 }
